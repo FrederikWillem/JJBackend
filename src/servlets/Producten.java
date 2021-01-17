@@ -1,14 +1,12 @@
 package servlets;
 
-import helpers.DatabaseConnection;
+import helpers.DataHelper;
 import helpers.HttpHelper;
-import helpers.SqlHelper;
+import helpers.SQLHelper;
+import helpers.UserDBConnection;
 
 import java.io.IOException;
-import java.sql.Connection;
 import java.sql.SQLException;
-import java.util.ArrayList;
-import java.util.HashMap;
 
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
@@ -27,30 +25,18 @@ import java.util.logging.Logger;
 public class Producten extends HttpServlet {
 	private static final long serialVersionUID = 1L;
 	private final static Logger LOGGER = Logger.getLogger(Logger.GLOBAL_LOGGER_NAME);
-       
-    /**
-     * @see HttpServlet#HttpServlet()
-     */
-    public Producten() {
-        super();
-        // TODO Auto-generated constructor stub
-    }
 
 	/**
 	 * @see HttpServlet#doGet(HttpServletRequest request, HttpServletResponse response)
 	 */
 	protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-		// TODO Auto-generated method stub
-		//response.getWriter().append("Served at: ").append(request.getContextPath());
-
 		String pathString = request.getPathInfo();
 		
-		//ArrayList<HashMap> data = null;
 		Object data = null;
 		
 		if(pathString == null || pathString.equals("/")) {
 			try {
-				data = SqlHelper.ConvertResultSetToHashMap(SqlHelper.SelectAllFromOuterLeftJoin("producten" ,DatabaseConnection.getInstance()));
+				data = DataHelper.ConvertResultSetToHashMap(SQLHelper.SelectAllFromOuterLeftJoin("producten" ,UserDBConnection.getInstance()));
 			} catch (SQLException e) {
 				LOGGER.warning("Could not fetch producten list! "+e);
 				response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
@@ -63,10 +49,10 @@ public class Producten extends HttpServlet {
 					case "id":
 						try {
 							int id = Integer.parseInt(pathParameters[2]);
-							data = SqlHelper.ConvertResultSetToHashMap(SqlHelper.SelectAllFromOuterLeftJoinWhere("producten", "product_id", id, DatabaseConnection.getInstance()));
-							data = SqlHelper.ConvertAndUnionResultSetsToHashMaps(
-									"informatie", 	SqlHelper.SelectAllFromOuterLeftJoinWhere("producten", "product_id", id, DatabaseConnection.getInstance()),
-									"fotos", 		SqlHelper.SelectAllFromWhere("product_afbeeldingen", "product_id", id, DatabaseConnection.getInstance())
+							data = DataHelper.ConvertResultSetToHashMap(SQLHelper.SelectAllFromOuterLeftJoinWhere("producten", "product_id", id, UserDBConnection.getInstance()));
+							data = DataHelper.ConvertAndUnionResultSetsToHashMaps(
+									"informatie", 	SQLHelper.SelectAllFromOuterLeftJoinWhere("producten", "product_id", id, UserDBConnection.getInstance()),
+									"fotos", 		SQLHelper.SelectAllFromWhere("product_afbeeldingen", "product_id", id, UserDBConnection.getInstance())
 									);
 						} catch (SQLException e) {
 							LOGGER.warning("Could not fetch product! "+e);
@@ -77,7 +63,7 @@ public class Producten extends HttpServlet {
 					case "cat":
 						try {
 							int cat = Integer.parseInt(pathParameters[2]);
-							data = SqlHelper.ConvertResultSetToHashMap(SqlHelper.SelectAllFromOuterLeftJoinWhere("producten", "categorie_id", cat, DatabaseConnection.getInstance()));
+							data = DataHelper.ConvertResultSetToHashMap(SQLHelper.SelectAllFromOuterLeftJoinWhere("producten", "categorie_id", cat, UserDBConnection.getInstance()));
 						} catch (SQLException e) {
 							LOGGER.warning("Could not fetch catergie producten! "+e);
 							response.sendError(HttpServletResponse.SC_NOT_FOUND);
@@ -87,7 +73,7 @@ public class Producten extends HttpServlet {
 					case "fotos":
 						try {
 							int productID = Integer.parseInt(pathParameters[2]);
-							data = SqlHelper.ConvertResultSetToHashMap(SqlHelper.SelectAllFromWhere("product_afbeeldingen", "product_id", productID, DatabaseConnection.getInstance()));
+							data = DataHelper.ConvertResultSetToHashMap(SQLHelper.SelectAllFromWhere("product_afbeeldingen", "product_id", productID, UserDBConnection.getInstance()));
 						} catch (SQLException e) {
 							LOGGER.warning("Could not fetch foto's of product! "+e);
 							response.sendError(HttpServletResponse.SC_NOT_FOUND);
@@ -100,7 +86,7 @@ public class Producten extends HttpServlet {
 				}
 			} else if (pathParameters.length == 2 && pathParameters[1].equals("fotos")) {
 				try {
-					data = SqlHelper.ConvertResultSetToHashMap(SqlHelper.SelectAllFrom("product_afbeeldingen", DatabaseConnection.getInstance()));
+					data = DataHelper.ConvertResultSetToHashMap(SQLHelper.SelectAllFrom("product_afbeeldingen", UserDBConnection.getInstance()));
 				} catch (SQLException e) {
 					LOGGER.warning("Could not fetch foto's producten! "+e);
 					response.sendError(HttpServletResponse.SC_NOT_FOUND);
@@ -121,27 +107,4 @@ public class Producten extends HttpServlet {
 			return;
 		}
 	}
-
-	/**
-	 * @see HttpServlet#doPost(HttpServletRequest request, HttpServletResponse response)
-	 */
-	protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-		// TODO Auto-generated method stub
-		//doGet(request, response);
-	}
-
-	/**
-	 * @see HttpServlet#doPut(HttpServletRequest, HttpServletResponse)
-	 */
-	protected void doPut(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-		// TODO Auto-generated method stub
-	}
-
-	/**
-	 * @see HttpServlet#doDelete(HttpServletRequest, HttpServletResponse)
-	 */
-	protected void doDelete(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-		// TODO Auto-generated method stub
-	}
-
 }
