@@ -102,6 +102,18 @@ public class SqlHelper {
 		return preparedStatement.executeQuery();
 	}
 	
+	public static HashMap<String, ArrayList<HashMap>> ConvertAndUnionResultSetsToHashMaps(String _key1, ResultSet _resultSet1, String _key2, ResultSet _resultSet2) throws SQLException {
+		HashMap hashMap = new HashMap<String, ArrayList<HashMap>>();
+		
+		ArrayList<HashMap> hashMap1 = ConvertResultSetToHashMap(_resultSet1);
+		ArrayList<HashMap> hashMap2 = ConvertResultSetToHashMap(_resultSet2);
+		
+		hashMap.put(_key1, hashMap1);
+		hashMap.put(_key2, hashMap2);
+		
+		return hashMap;
+	}
+	
 	public static HashMap<String, ArrayList<HashMap>> ConvertAndUnionResultSetsToHashMaps(String _key1, ResultSet _resultSet1, String _key2, ResultSet _resultSet2, String _key3, ResultSet _resultSet3) throws SQLException {
 		HashMap hashMap = new HashMap<String, ArrayList<HashMap>>();
 		

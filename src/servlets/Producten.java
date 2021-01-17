@@ -45,7 +45,8 @@ public class Producten extends HttpServlet {
 
 		String pathString = request.getPathInfo();
 		
-		ArrayList<HashMap> data = null;
+		//ArrayList<HashMap> data = null;
+		Object data = null;
 		
 		if(pathString == null || pathString.equals("/")) {
 			try {
@@ -63,6 +64,10 @@ public class Producten extends HttpServlet {
 						try {
 							int id = Integer.parseInt(pathParameters[2]);
 							data = SqlHelper.ConvertResultSetToHashMap(SqlHelper.SelectAllFromOuterLeftJoinWhere("producten", "product_id", id, DatabaseConnection.getInstance()));
+							data = SqlHelper.ConvertAndUnionResultSetsToHashMaps(
+									"informatie", 	SqlHelper.SelectAllFromOuterLeftJoinWhere("producten", "product_id", id, DatabaseConnection.getInstance()),
+									"fotos", 		SqlHelper.SelectAllFromWhere("product_afbeeldingen", "product_id", id, DatabaseConnection.getInstance())
+									);
 						} catch (SQLException e) {
 							LOGGER.warning("Could not fetch product! "+e);
 							response.sendError(HttpServletResponse.SC_NOT_FOUND);
