@@ -38,12 +38,20 @@ public class Eigenschappen extends HttpServlet {
 	protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
 		String pathString = request.getPathInfo();
 		
-		ArrayList<HashMap> data = null;
+		//ArrayList<HashMap> data = null;
+		Object data = null;
 		
 		if(pathString == null || pathString.equals("/")) {
-			LOGGER.warning("Bad request!");
-			response.sendError(HttpServletResponse.SC_BAD_REQUEST);
-			return;
+			try {
+				data = SqlHelper.ConvertAndUnionResultSetsToHashMaps(
+						"categorien", SqlHelper.SelectAllFrom("categorien", DatabaseConnection.getInstance()), 
+						"kleuren", SqlHelper.SelectAllFrom("kleuren", DatabaseConnection.getInstance()), 
+						"materialen", SqlHelper.SelectAllFrom("materialen", DatabaseConnection.getInstance()));
+			} catch (SQLException e) {
+				LOGGER.warning("Could not fetch eigenschappen! "+e);
+				response.sendError(HttpServletResponse.SC_NOT_FOUND);
+				return;
+			}
 		} else {
 			String[] pathParameters = pathString.split("/");
 			if (pathParameters.length == 2) {
@@ -68,7 +76,7 @@ public class Eigenschappen extends HttpServlet {
 					break;
 				case ("categorien"):
 					try {
-						data = SqlHelper.ConvertResultSetToHashMap(SqlHelper.SelectAllFrom("catergorien", DatabaseConnection.getInstance()));
+						data = SqlHelper.ConvertResultSetToHashMap(SqlHelper.SelectAllFrom("categorien", DatabaseConnection.getInstance()));
 					} catch (SQLException e) {
 						LOGGER.warning("Could not fetch kleuren! "+e);
 						response.sendError(HttpServletResponse.SC_NOT_FOUND);
