@@ -32,7 +32,7 @@ abstract class SQLServlet extends HttpServlet {
 		}
 	}
 	
-	protected void DoGetWithSQLException(HttpServletRequest _request, HttpServletResponse _response) throws ServletException, IOException, SQLException{
+	protected void DoGetWithSQLException(HttpServletRequest _request, HttpServletResponse _response) throws ServletException, IOException, SQLException {
 		String pathString = _request.getPathInfo();
 		
 		Object data = null;
@@ -50,7 +50,6 @@ abstract class SQLServlet extends HttpServlet {
 					} else {
 						data = GetForOneParameter(pathParameters[1]);
 					}
-					
 					break;
 				case 2:
 					if(StringUtils.isNumeric(pathParameters[2])) {
@@ -93,26 +92,163 @@ abstract class SQLServlet extends HttpServlet {
 	protected Object GetForTwoParameters(String _parameter1, String _parameter2) throws SQLException {
 		return null;
 	}
+	
+	
+	protected Boolean IsAuthorizedTo(String _input) {
+		return false;
+	}
 
 	/**
 	 * @see HttpServlet#doPost(HttpServletRequest request, HttpServletResponse response)
 	 */
 	protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-
+		try {
+			DoPostWithSQLException(request, response);
+		} catch (SQLException e) {
+			LOGGER.warning("Could not get data from database! "+e);
+			response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
+			return;
+		}
+	}
+	
+	protected void DoPostWithSQLException(HttpServletRequest _request, HttpServletResponse _response) throws ServletException, IOException, SQLException {
+		String input = HttpHelper.getInput(_request);
+		
+		if(!IsAuthorizedTo(input)) {
+			LOGGER.severe("Unauthorized request!");
+			_response.sendError(HttpServletResponse.SC_NOT_FOUND);
+			return;
+		}
+		
+		String pathInfo = _request.getPathInfo();
+		
+		if(pathInfo == null || pathInfo.equals("/")){
+			if(PostForZeroParameters(input)) {
+				_response.sendError(HttpServletResponse.SC_ACCEPTED);
+			} else {
+				_response.sendError(HttpServletResponse.SC_BAD_REQUEST);
+			}
+		} else {
+			_response.sendError(HttpServletResponse.SC_BAD_REQUEST);
+			LOGGER.warning("doPost: BAD REQUEST: no parameters can be given!");
+		}
+	}
+	
+	protected Boolean PostForZeroParameters(String input) {
+		return false;
 	}
 
 	/**
 	 * @see HttpServlet#doPut(HttpServletRequest, HttpServletResponse)
 	 */
 	protected void doPut(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-		// TODO Auto-generated method stub
+		try {
+			DoPutWithSQLException(request, response);
+		} catch (SQLException e) {
+			LOGGER.warning("Could not get data from database! "+e);
+			response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
+			return;
+		}
+	}
+	
+	protected void DoPutWithSQLException(HttpServletRequest _request, HttpServletResponse _response) throws ServletException, IOException, SQLException {
+		String input = HttpHelper.getInput(_request);
+		
+		if(!IsAuthorizedTo(input)) {
+			LOGGER.severe("Unauthorized request!");
+			_response.sendError(HttpServletResponse.SC_NOT_FOUND);
+			return;
+		}
+		
+		String pathParameters = _request.getPathInfo();
+		
+		Boolean accepted;
+		if(pathParameters != null || !(pathParameters.equals("/"))){
+			String[] parameters = pathParameters.split("/");
+			
+			switch(parameters.length - 1) {
+				case 1:
+					if(StringUtils.isNumeric(parameters[1])) {
+						int parameter = Integer.parseInt(parameters[1]);
+						accepted = PutForOneParameter(parameter, input);
+					} else {
+						accepted = false;
+					}
+					break;
+				default:
+					accepted = false;
+					break;
+			}
+						
+		} else {
+			accepted = false;
+		}
+		
+		if(accepted) {
+			_response.sendError(HttpServletResponse.SC_ACCEPTED);
+		} else {
+			_response.sendError(HttpServletResponse.SC_NOT_ACCEPTABLE);
+		}
+	}
+	
+	protected Boolean PutForOneParameter(int parameter, String input) throws SQLException {
+		return false;
 	}
 
 	/**
 	 * @see HttpServlet#doDelete(HttpServletRequest, HttpServletResponse)
 	 */
 	protected void doDelete(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-		// TODO Auto-generated method stub
+		try {
+			DoDeleteWithSQLException(request, response);
+		} catch (SQLException e) {
+			LOGGER.warning("Could not get data from database! "+e);
+			response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
+			return;
+		}
 	}
-
+	
+	protected void DoDeleteWithSQLException(HttpServletRequest _request, HttpServletResponse _response) throws ServletException, IOException, SQLException {
+		String input = HttpHelper.getInput(_request);
+		
+		if(!IsAuthorizedTo(input)) {
+			LOGGER.severe("Unauthorized request!");
+			_response.sendError(HttpServletResponse.SC_NOT_FOUND);
+			return;
+		}
+		
+		String pathParameters = _request.getPathInfo();
+		
+		Boolean accepted;
+		if(pathParameters != null || !(pathParameters.equals("/"))){
+			String[] parameters = pathParameters.split("/");
+			
+			switch(parameters.length - 1) {
+				case 1:
+					if(StringUtils.isNumeric(parameters[1])) {
+						int parameter = Integer.parseInt(parameters[1]);
+						accepted = DeleteForOneParameter(parameter);
+					} else {
+						accepted = false;
+					}
+					break;
+				default:
+					accepted = false;
+					break;
+			}
+						
+		} else {
+			accepted = false;
+		}
+		
+		if(accepted) {
+			_response.sendError(HttpServletResponse.SC_ACCEPTED);
+		} else {
+			_response.sendError(HttpServletResponse.SC_NOT_ACCEPTABLE);
+		}
+	}
+	
+	protected Boolean DeleteForOneParameter(int _parameter) throws SQLException {
+		return false;
+	}
 }

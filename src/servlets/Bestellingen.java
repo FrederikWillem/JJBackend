@@ -19,6 +19,12 @@ public class Bestellingen extends SQLServlet {
 		return DataHelper.ConvertResultSetToHashMap(SQLHelper.SelectAllFrom(tableName, UserDBConnection.getInstance()));
 	}
 	
+	protected Object GetForOneParameter(int _parameter) throws SQLException {
+		//return DataHelper.ConvertResultSetToHashMap(SQLHelper.SelectAllFromOuterLeftJoinWhere(tableName, "bestellingsnummer", _parameter, UserDBConnection.getInstance()));
+		//return SQLHelper.GetForeignKeysInfo(tableName, UserDBConnection.getInstance());
+		return DataHelper.ConvertResultSetToHashMap(SQLHelper.SelectAllFromOuterLeftJoinWhere("producten_bestelling", "bestellingsnummer", _parameter, UserDBConnection.getInstance()));
+	}
+	
 	protected Object GetForTwoParameters(String _parameter1, int _parameter2) throws SQLException {
 		switch(_parameter1) {
 			case "klant":
