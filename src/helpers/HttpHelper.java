@@ -57,6 +57,10 @@ public class HttpHelper {
 		//parse data to json
 		String json = JSONValue.toJSONString(obj);
 		
+		//set headers
+		response.setContentType("application/json");
+		response.setHeader("Access-Control-Allow-Origin", "*");
+		
 		//write to output
 		out.print(json);
 	}
@@ -78,6 +82,10 @@ public class HttpHelper {
 		String html = "<html><body><pre><code><h1>JSON response will contain:</h1>";
 		html += json;
 		html += "</code></pre></body></html>";
+		
+		//set headers
+		response.setContentType("text/html");
+		response.setHeader("Access-Control-Allow-Origin", "*");
 		
 		//write data to output
 		out.print(html);
