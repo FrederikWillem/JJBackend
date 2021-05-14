@@ -30,9 +30,10 @@ public class Producten extends SQLServlet {
 	}
 	
 	protected Object GetForOneParameter(int _parameter) throws SQLException {
+		int value2 = 1;
 		return DataHelper.ConvertAndUnionResultSetsToHashMaps(
 				"informatie", 	SQLHelper.SelectAllFromOuterLeftJoinWhere(tableName, "product_id", _parameter, UserDBConnection.getInstance()),
-				"fotos", 		SQLHelper.SelectAllFromWhere("product_afbeeldingen", "product_id", _parameter, UserDBConnection.getInstance())
+				"fotos", 	SQLHelper.SelectAllFromWhere("product_afbeeldingen", "product_id", _parameter, UserDBConnection.getInstance())
 				);
 		/*
 		return DataHelper.ConvertResultSetToHashMap(SQLHelper.SelectAllFromOuterLeftJoinWhere("producten", "product_id", id, UserDBConnection.getInstance()));
@@ -42,7 +43,11 @@ public class Producten extends SQLServlet {
 	protected Object GetForTwoParameters(String _parameter1, int _parameter2) throws SQLException {
 		switch(_parameter1) {
 			case "categorie":
-				return DataHelper.ConvertResultSetToHashMap(SQLHelper.SelectAllFromOuterLeftJoinWhere(tableName, "categorie_id", _parameter2, UserDBConnection.getInstance()));
+				return DataHelper.MergeInfoResultSet2To1WhereValueAtKeyIsEqual(
+						SQLHelper.SelectAllFromOuterLeftJoinWhere(tableName, "categorie_id", _parameter2, UserDBConnection.getInstance()),
+						SQLHelper.SelectAllFromWhere("product_afbeeldingen", "hoofd_afbeelding", 1, UserDBConnection.getInstance()),
+						"product_id"
+						);
 			default:
 				return null;
 		}

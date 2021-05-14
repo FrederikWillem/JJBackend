@@ -99,4 +99,12 @@ private final static Logger LOGGER = Logger.getLogger(Logger.GLOBAL_LOGGER_NAME)
 		LOGGER.finest("Executing query: 'SELECT * FROM "+_table+" WHERE "+_column+" = "+_value+";'");
 		return preparedStatement.executeQuery();
 	}
+	
+	public static ResultSet SelectAllFromWhereAndWhere(String _table, String _column1, int _value1, String _column2, int _value2, Connection _connection) throws SQLException {
+		PreparedStatement preparedStatement = _connection.prepareStatement("SELECT * FROM "+_table+" WHERE "+_column1+" = ? AND "+_column2+" = ?;");
+		preparedStatement.setInt(1, _value1);
+		preparedStatement.setInt(2, _value2);
+		LOGGER.finest("Executing query: 'SELECT * FROM "+_table+" WHERE "+_column1+" = "+_value1+"AND "+_column2+" = "+_value2+";'");
+		return preparedStatement.executeQuery();
+	}
 }

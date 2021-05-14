@@ -37,6 +37,29 @@ public class DataHelper {
 		return hashMap;
 	}
 	
+	public static ArrayList<HashMap> ConvertAndMergeResultSetsToHashMap(ResultSet _resultSet1, ResultSet _resultSet2) throws SQLException {
+		ArrayList<HashMap> arrayList = ConvertResultSetToHashMap(_resultSet1);
+		arrayList.addAll(ConvertResultSetToHashMap(_resultSet2));
+		return arrayList;
+	}
+	
+	public static ArrayList<HashMap> MergeInfoResultSet2To1WhereValueAtKeyIsEqual(ResultSet _resultSet1, ResultSet _resultSet2, String _key) throws SQLException {
+		ArrayList<HashMap> arrayList1 = ConvertResultSetToHashMap(_resultSet1);
+		ArrayList<HashMap> arrayList2 = ConvertResultSetToHashMap(_resultSet2);
+		
+		int count1 = arrayList1.size();
+		int count2 = arrayList2.size();
+		for(int i = 0; i < count1; i++) {
+			for(int j = 0; j < count2; j++) {
+				if(arrayList1.get(i).get(_key) == arrayList2.get(j).get(_key)) {
+					arrayList1.get(i).putAll(arrayList2.get(j));
+					break;
+				}
+			}
+		}
+		return arrayList1;
+	}
+	
 	public static ArrayList<HashMap> ConvertResultSetToHashMap(ResultSet _resultSet) throws SQLException {
 		//get metadata
 		ResultSetMetaData rsmd = _resultSet.getMetaData();
